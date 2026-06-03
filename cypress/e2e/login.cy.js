@@ -2,10 +2,15 @@
 const { faker } = require('@faker-js/faker'); //importa a biblioteca faker para gerar dados aleatórios
 const email = faker.internet.email() //gera um email aleatório usando a biblioteca faker
 const firstName1 = faker.person.firstName() //gera um nome aleatório usando a biblioteca faker
+const password = faker.internet.password() //gera uma senha aleatória usando a biblioteca faker
 
 describe('Cadastrar usuário', () => {
+    beforeEach(() => {
+        cy.visit('http://automationexercise.com') //acessa a página inicial do site antes de cada teste
+    })
+
+
     it('Acessar a página de cadastro', () => {
-        cy.visit('http://automationexercise.com') //acessa a página inicial do site
         cy.get('.shop-menu > .nav > :nth-child(4) > a').click() //clica no botão de cadastro/login
         cy.get('.signup-form > h2').should('contain', 'New User Signup!') //verifica se o título da página de cadastro/login está correto
         cy.get('[data-qa="signup-name"]').type(firstName1) //preenche o nome
@@ -17,11 +22,11 @@ describe('Cadastrar usuário', () => {
         cy.get(':nth-child(3) > .top > [data-qa="title"] > span > [name="title"]').click() //seleciona o título
         cy.get('[data-qa="name"]').clear().type(firstName1) //preenche o nome
 
-        cy.wait(5000) //espera 5 segundo para garantir que o campo de email esteja limpo antes de preenchê-lo novamente
+        cy.wait(1000) //espera 1 segundo para garantir que o campo de email esteja limpo antes de preenchê-lo novamente
 
         cy.get('[data-qa="email"]').should('have.value', email) //verifica se o email está preenchido corretamente
 
-        cy.get('[data-qa="password"]').type('123456') //preenche a senha
+        cy.get('[data-qa="password"]').type(password) //preenche a senha
         cy.get('[data-qa="days"]').select('12') //seleciona o dia de nascimento
         cy.get('[data-qa="months"]').select('February') //seleciona o mês de nascimento
         cy.get('[data-qa="years"]').select('1993') //seleciona o ano de nascimento
@@ -44,10 +49,26 @@ describe('Cadastrar usuário', () => {
 
         cy.get(':nth-child(10) > a').should('contain', `Logged in as ${firstName1}`) //verifica se o nome do usuário logado está correto
 
-        cy.get('.shop-menu > .nav > :nth-child(5) > a').click() //clica no botão de deletar conta
+        /*cy.get('.shop-menu > .nav > :nth-child(5) > a').click() //clica no botão de deletar conta
+        cy.get('.col-sm-9 > :nth-child(2)').should('contain', 'Your account has been permanently deleted!') //verifica se o título da página de conta deletada está correto*/
+        
+    })
+
+    it('Login do usuário com e-mail e senha corretos', () => {
+        cy.get('.active > :nth-child(1) > h1').should('contain', 'AutomationExercise') //verifica se o título da página de login está correto
+        cy.get('.active > :nth-child(1) > h2').should('contain', 'Full-Fledged practice website for Automation Engineers') //verifica se o título da seção de login está correto
+
+        cy.get('.shop-menu > .nav > :nth-child(4) > a').click() //clica no botão de cadastro/login
+        cy.get('.login-form > h2').should('contain', 'Login to your account') //verifica se o título da seção de login está correto
+        cy.get('[data-qa="login-email"]').type(email) //preenche o email
+        cy.get('[data-qa="login-password"]').type(password) //preenche a senha
+        cy.get('[data-qa="login-button"]').click() //clica no botão de login
+
+        cy.get(':nth-child(10) > a').should('contain', `Logged in as ${firstName1}`) //verifica se o nome do usuário logado está correto
+
+        cy.get('.shop-menu > .nav > :nth-child(5) > a').click() //clica no botão excluir conta
         cy.get('.col-sm-9 > :nth-child(2)').should('contain', 'Your account has been permanently deleted!') //verifica se o título da página de conta deletada está correto
 
-        
     })
 
 })
